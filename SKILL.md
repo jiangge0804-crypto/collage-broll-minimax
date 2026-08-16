@@ -1,6 +1,6 @@
 ---
-name: 拼贴动画
-description: 将约 5 秒口播文稿、观点句或抽象概念做成高级 editorial halftone paper-collage / 半调纸拼贴 B-roll。用户说“拼贴动画”“collage b-roll”“纸拼贴 b-roll”“半调拼贴”“拼贴风格配画面”“用这段文稿做拼贴动画”“gbro-collage-broll”，或希望把一句文稿转成拼贴视觉隐喻时，必须使用此 skill。强制采用三阶段审批：先只提视觉隐喻，用户确认后才生成彩色拼贴静帧，静帧再次确认后才默认调用 MiniMax H3（海螺 3.0，platform.minimaxi.com 国内直连）生成首尾帧组装动画。默认视频模型固定为 MiniMax-H3；只有用户明确指定其他模型时才切换。
+name: collage-broll-minimax
+description: 将约 5 秒口播文稿、观点句或抽象概念做成高级 editorial halftone paper-collage / 半调纸拼贴 B-roll。用户说“拼贴动画”“collage b-roll”“纸拼贴 b-roll”“半调拼贴”“拼贴风格配画面”“用这段文稿做拼贴动画”“gbro-collage-broll”“collage-broll-minimax”，或希望把一句文稿转成拼贴视觉隐喻时，必须使用此 skill。强制采用三阶段审批：先只提视觉隐喻，用户确认后才生成彩色拼贴静帧，静帧再次确认后才默认调用 MiniMax H3（海螺 3.0，platform.minimaxi.com 国内直连）生成首尾帧组装动画。默认视频模型固定为 MiniMax-H3；只有用户明确指定其他模型时才切换。
 compatibility: Gate 2 依赖环境内置 image_gen 工具（WorkBuddy 用 ImageGen）。视频生成脚本已随本 skill 自带（scripts/generate_video_minimax.py，纯标准库、国内直连 MiniMax 开放平台），另需 Python >= 3.10、已配置的 MINIMAX_API_KEY，以及 ffmpeg / ffprobe。首次使用先按「首次使用：环境自检」完成配置。
 ---
 
