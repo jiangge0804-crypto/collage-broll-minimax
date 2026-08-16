@@ -10,13 +10,13 @@
     {
       "id": 2,
       "prompt": "上一轮你给的‘知识卡片通过轨道重新连成网络’隐喻我确认了。继续帮我做静帧，底色不要全是蓝色，素材可以有彩色纸片。",
-      "expected_output": "At Gate 2, should create a varied-color editorial halftone paper-collage visual spec and final still, save it in the project, show a numbered still contact sheet, and stop for a second approval. It must not call Omni Flash yet.",
+      "expected_output": "At Gate 2, should create a varied-color editorial halftone paper-collage visual spec and final still, save it in the project, show a numbered still contact sheet, and stop for a second approval. It must not call the video model yet.",
       "files": []
     },
     {
       "id": 3,
       "prompt": "这些彩色拼贴静帧全部通过，帮我继续生成视频。",
-      "expected_output": "At Gate 3, should automatically use gemini-omni-flash-preview through the gemini-omni-flash-api workflow without asking for a model, use exact empty first and approved last frames, generate 5s 9:16 video, strip audio, create contact sheets and verify the end frame. It must not default to Veo.",
+      "expected_output": "At Gate 3, should automatically use MiniMax-H3 through the generate_video_minimax.py workflow without asking for a model, use exact empty first and approved last frames, generate 5s 9:16 video, strip audio, create contact sheets and verify the end frame. It must not default to Veo, Gemini or Seedance.",
       "files": []
     },
     {

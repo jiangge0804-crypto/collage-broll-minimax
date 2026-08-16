@@ -1,10 +1,10 @@
 ---
-name: gbro-collage-broll
-description: 将约 5 秒口播文稿、观点句或抽象概念做成高级 editorial halftone paper-collage / 半调纸拼贴 B-roll。用户说“collage b-roll”“纸拼贴 b-roll”“半调拼贴”“拼贴风格配画面”“用这段文稿做拼贴动画”“gbro-collage-broll”，或希望把一句文稿转成拼贴视觉隐喻时，必须使用此 skill。强制采用三阶段审批：先只提视觉隐喻，用户确认后才生成彩色拼贴静帧，静帧再次确认后才默认调用 Gemini Omni Flash 生成首尾帧组装动画。默认视频模型固定为 gemini-omni-flash-preview，不再默认使用 Veo；只有用户明确指定其他模型时才切换。
-compatibility: 在 Codex 环境运行（Gate 2 依赖内置 image_gen）。视频生成脚本已随本 skill 自带（scripts/generate_video.py），另需 Python >= 3.10、google-genai >= 2.10.0、已配置的 GEMINI_API_KEY，以及 ffmpeg / ffprobe。首次使用先按「首次使用：环境自检」完成配置。
+name: 拼贴动画
+description: 将约 5 秒口播文稿、观点句或抽象概念做成高级 editorial halftone paper-collage / 半调纸拼贴 B-roll。用户说“拼贴动画”“collage b-roll”“纸拼贴 b-roll”“半调拼贴”“拼贴风格配画面”“用这段文稿做拼贴动画”“gbro-collage-broll”，或希望把一句文稿转成拼贴视觉隐喻时，必须使用此 skill。强制采用三阶段审批：先只提视觉隐喻，用户确认后才生成彩色拼贴静帧，静帧再次确认后才默认调用 MiniMax H3（海螺 3.0，platform.minimaxi.com 国内直连）生成首尾帧组装动画。默认视频模型固定为 MiniMax-H3；只有用户明确指定其他模型时才切换。
+compatibility: Gate 2 依赖环境内置 image_gen 工具（WorkBuddy 用 ImageGen）。视频生成脚本已随本 skill 自带（scripts/generate_video_minimax.py，纯标准库、国内直连 MiniMax 开放平台），另需 Python >= 3.10、已配置的 MINIMAX_API_KEY，以及 ffmpeg / ffprobe。首次使用先按「首次使用：环境自检」完成配置。
 ---
 
-# gbro Collage B-roll
+# 拼贴动画（原 gbro Collage B-roll）
 
 把一句约 5 秒的口播压成一个 sharp visual idea，再做成高级编辑风纸拼贴组装动画。
 
@@ -12,7 +12,7 @@ compatibility: 在 Codex 环境运行（Gate 2 依赖内置 image_gen）。视�
 
 1. 只设计视觉隐喻，等待用户确认
 2. 只生成最终静帧，等待用户确认
-3. 自动调用 Gemini Omni Flash 生成视频并完成 QA
+3. 自动调用 MiniMax H3（海螺 3.0）生成视频并完成 QA
 
 这两个确认闸门是工作流的一部分。它们让用户把注意力放在审美和方向上，同时避免错误隐喻或错误静帧直接消耗视频生成成本。
 
@@ -28,14 +28,14 @@ bash <本skill目录>/scripts/check_setup.sh
 
 ### 配置指南（按缺失项输出）
 
-1. **GEMINI_API_KEY 未设置**
-   到 [Google AI Studio](https://aistudio.google.com/apikey) 创建 API key，然后写入 shell 配置：
+1. **MINIMAX_API_KEY 未设置**
+   到 [MiniMax 开放平台 - 接口密钥](https://platform.minimaxi.com/user-center/basic-information/interface-key) 创建 API Key（国内直连），然后写入 shell 配置：
 
    ```bash
-   echo 'export GEMINI_API_KEY="你的key"' >> ~/.zshrc && source ~/.zshrc
+   echo 'export MINIMAX_API_KEY="你的key"' >> ~/.zshrc && source ~/.zshrc
    ```
 
-   注意：视频生成按量计费，由这个 key 对应的 Google 账号承担。
+   注意：视频生成按量计费，由这个 key 对应的 MiniMax 账号承担；首次使用 H3 需先在平台完成按量购买开通（见[定价页](https://platform.minimaxi.com/docs/guides/pricing-paygo)）。
 
 2. **ffmpeg / ffprobe 缺失**
    macOS：`brew install ffmpeg`；Debian/Ubuntu：`sudo apt install ffmpeg`。
@@ -43,16 +43,8 @@ bash <本skill目录>/scripts/check_setup.sh
 3. **Python 环境缺失或版本过旧**（需要 >= 3.10）
    macOS：`brew install python3`；或从 python.org 安装。
 
-4. **共享 venv 未创建**（google-genai >= 2.10.0）
-   征得用户同意后自动创建，无需用户手动操作：
-
-   ```bash
-   python3 -m venv ~/hyperframes-projects/.omni-venv
-   ~/hyperframes-projects/.omni-venv/bin/python -m pip install --upgrade "google-genai>=2.10.0" "httpx[socks]"
-   ```
-
-5. **不在 Codex 环境 / 没有内置 image_gen**
-   Gate 2 的静帧生成依赖 Codex 内置 `image_gen` 工具。在其他 agent 环境下运行时，向用户说明需要自行提供等效的图片生成方式（或手动提供静帧图片后从 Gate 2 确认继续）。
+4. **没有内置 image_gen 工具**
+   Gate 2 的静帧生成依赖环境内置的图片生成工具（WorkBuddy 用 ImageGen）。在没有等效工具的环境下运行时，向用户说明需要自行提供等效的图片生成方式（或手动提供静帧图片后从 Gate 2 确认继续）。
 
 ## 强制审批协议
 
@@ -75,21 +67,21 @@ bash <本skill目录>/scripts/check_setup.sh
 
 ### Gate 2：静帧确认
 
-隐喻确认后，才写 visual spec 和 imagegen prompt，并用 Codex `imagegen` 生成最终静帧。
+隐喻确认后，才写 visual spec 和 imagegen prompt，并用环境内置的图片生成工具（如 WorkBuddy 的 ImageGen）生成最终静帧。
 
-把原图保存到项目目录，生成带编号的静帧 contact sheet，向用户展示并再次停下。此阶段仍然不调用 Omni Flash，也不生成视频。
+把原图保存到项目目录，生成带编号的静帧 contact sheet，向用户展示并再次停下。此阶段仍然不调用 MiniMax H3，也不生成视频。
 
 如果用户只确认部分静帧，只让通过的条目进入 Gate 3；需要修改的静帧先重生并重新确认。
 
 ### Gate 3：视频生成
 
-静帧确认后，不再询问使用哪个视频模型，直接使用本 skill 自带的 `scripts/generate_video.py`，默认调用：
+静帧确认后，不再询问使用哪个视频模型，直接使用本 skill 自带的 `scripts/generate_video_minimax.py`，默认调用：
 
 ```text
-gemini-omni-flash-preview
+MiniMax-H3
 ```
 
-只有用户明确指定其他视频模型时，才覆盖这个默认值。不要自动调用 Veo，也不要把模型选择再抛给用户。
+只有用户明确指定其他视频模型时，才覆盖这个默认值。不要把模型选择再抛给用户。
 
 ## 成功标准
 
@@ -125,20 +117,20 @@ gemini-omni-flash-preview
 ├── brief.md
 ├── visual-spec.json
 ├── imagegen-prompts.md
-├── omni-jobs.json
+├── video-jobs.json
 ├── gate2-qa.md
 ├── gate3-qa.md
 ├── still-contact-sheet.jpg
-├── omni-contact-sheet-all.jpg
+├── video-contact-sheet-all.jpg
 ├── video-first-frame-all.jpg
 ├── end-frame-comparison-all.jpg
 ├── 01-概念名/
-│   ├── omni-prompt.txt
+│   ├── video-prompt.txt
 │   ├── frames/
 │   │   ├── last-frame-original.png
 │   │   ├── first-frame.png
 │   │   └── last-frame.png
-│   └── omni/run-v01/
+│   └── video/run-v01/
 │       ├── final-5s.mp4
 │       ├── final-5s-noaudio.mp4
 │       ├── contact-sheet.jpg
@@ -158,7 +150,7 @@ gemini-omni-flash-preview
 - 动作动词：打开、连接、漏掉、装订、归档、点亮、压缩、分叉、组装
 - 可视化隐喻：机器、时钟、胶片、档案柜、控制台、规则册、漏斗、轨道、棋子
 
-不要把文稿逐字放进画面。默认一条文稿只做一个隐喻，控制在 3–6 个关键物件；元素过多会让语意变弱，也会让 Omni 组装不稳定。
+不要把文稿逐字放进画面。默认一条文稿只做一个隐喻，控制在 3–6 个关键物件；元素过多会让语意变弱，也会让首尾帧组装动画不稳定。
 
 批量隐喻优先形成前后叙事：例如先表现手工消耗与经验流失，再表现规范沉淀与人机分工。
 
@@ -223,7 +215,7 @@ gemini-omni-flash-preview
 
 ### Imagegen prompt 模板
 
-使用 Codex 内置 `image_gen` 工具（如有本地 `imagegen` skill 则一并遵守）：
+使用环境内置的图片生成工具（WorkBuddy 中为 ImageGen；如有本地 `imagegen` skill 则一并遵守）：
 
 ```text
 Use case: ads-marketing
@@ -250,7 +242,7 @@ Avoid: no typography, no readable letters, no numerals, no logos, no watermark, 
 
 如果用户要求重生部分静帧，重生后生成 `still-contact-sheet-v2.jpg`（后续轮次递增 v3、v4…），保留旧版 contact sheet 不覆盖，方便对比。
 
-## Phase 3：用 Omni Flash 生成视频
+## Phase 3：用 MiniMax H3 生成视频
 
 ### 1. 准备首尾帧
 
@@ -271,7 +263,7 @@ ffmpeg -y -f lavfi -i color=c=0x<HEX>:s=1080x1920 \
 
 如果用户明确要求不从完全空白开始，首帧才保留一个基础物件。
 
-### 2. 写 Omni 动画 prompt
+### 2. 写动画 prompt
 
 动作顺序默认采用：
 
@@ -293,33 +285,24 @@ No scene cuts, no camera movement, no zoom, no morphing, no new objects, no text
 
 每条 prompt 都要明确 Image 1 是空首帧、Image 2 是确认过的完成帧。最终构图必须贴近 Image 2，不让模型自由改造尾帧。
 
-### 3. 检查 Omni 运行环境
+### 3. 检查运行环境
 
-使用实际运行脚本的 Python 解释器检查 `google-genai` 版本。需要 `>= 2.10.0`。
+`generate_video_minimax.py` 只依赖 Python 标准库（>= 3.10），不需要任何第三方 SDK 或 venv，直接用系统 `python3` 运行。
 
-如果系统 Python 版本过旧或属于 externally managed environment，不要使用 `--break-system-packages`。使用共享隔离环境 `~/hyperframes-projects/.omni-venv/`——已存在就直接复用，只在不存在时创建，不要在每个项目内新建 `.venv`：
+确认 `MINIMAX_API_KEY` 已设置，但不要输出或记录密钥内容。
 
-```bash
-[ -x ~/hyperframes-projects/.omni-venv/bin/python ] || {
-  python3 -m venv ~/hyperframes-projects/.omni-venv
-  ~/hyperframes-projects/.omni-venv/bin/python -m pip install --upgrade "google-genai>=2.10.0" "httpx[socks]"
-}
-```
+### 4. 批量调用 MiniMax H3
 
-确认 `GEMINI_API_KEY` 已设置，但不要输出或记录密钥内容。
-
-### 4. 批量调用 Gemini Omni Flash
-
-创建 `omni-jobs.json`。每个 job 使用两张图片做关键帧插值：
+创建 `video-jobs.json`。每个 job 使用两张图片做首尾帧插值：
 
 ```json
 {
-  "prompt": "<omni prompt>",
+  "prompt": "<动画 prompt>",
   "image": [
     "<item>/frames/first-frame.png",
     "<item>/frames/last-frame.png"
   ],
-  "output": "<item>/omni/run-v01/final-5s.mp4",
+  "output": "<item>/video/run-v01/final-5s.mp4",
   "aspect_ratio": "9:16",
   "duration": 5
 }
@@ -328,21 +311,20 @@ No scene cuts, no camera movement, no zoom, no morphing, no new objects, no text
 使用本 skill 自带脚本：
 
 ```bash
-~/hyperframes-projects/.omni-venv/bin/python \
-  <本skill目录>/scripts/generate_video.py \
-  --batch <project>/omni-jobs.json \
+python3 <本skill目录>/scripts/generate_video_minimax.py \
+  --batch <project>/video-jobs.json \
   --concurrency 3
 ```
 
-脚本默认模型即 `gemini-omni-flash-preview`。如果出现 legacy Interactions API schema 错误，说明用错了旧 SDK；切换到共享环境 `~/hyperframes-projects/.omni-venv/bin/python` 后重试，不要退回 Veo。
+脚本默认模型即 `MiniMax-H3`、默认分辨率 768P（更省钱；要 2K 画质可在 job 里加 `"resolution": "2K"`）。首尾帧模式下宽高比由输入图片自动决定（9:16 帧即得 9:16 视频），图片以 base64 内联上传。如果报未开通/欠费错误，去 MiniMax 开放平台完成按量购买开通后重试。
 
-### 5. 强制无声交付
+### 5. 强制无声交付（并统一到 720×1280）
 
-即使 prompt 已写 `no sound`，仍用 ffmpeg 输出零音轨版本：
+MiniMax H3 原生带立体声音轨，且 768P 档 9:16 输出为 768×1365。交付前用 ffmpeg 去音轨并缩放到标准 720×1280：
 
 ```bash
 ffmpeg -y -i <run>/final-5s.mp4 \
-  -map 0:v:0 -c:v copy -an \
+  -map 0:v:0 -vf "scale=720:1280" -c:v libx264 -crf 18 -pix_fmt yuv420p -an \
   <run>/final-5s-noaudio.mp4
 ```
 
@@ -371,7 +353,7 @@ ffmpeg -y -i <run>/final-5s-noaudio.mp4 \
 
 另外抽取视频末帧，与确认静帧并排生成 `end-frame-comparison.jpg`。批量项目再合并三张总览图：
 
-- `omni-contact-sheet-all.jpg`：全部成片逐秒抽帧
+- `video-contact-sheet-all.jpg`：全部成片逐秒抽帧
 - `video-first-frame-all.jpg`：全部成片实际首帧，验证真的从空色场开始
 - `end-frame-comparison-all.jpg`：确认静帧与视频末帧并排对照
 
@@ -389,14 +371,14 @@ ffmpeg -y -i <run>/final-5s-noaudio.mp4 \
 
 向用户交付：
 
-- 每条 `<item>/omni/run-v01/final-5s-noaudio.mp4`
+- 每条 `<item>/video/run-v01/final-5s-noaudio.mp4`
 - 每条 contact sheet
 - 批量总 contact sheet
 - 最终帧对照图
 - 一句说明每条文稿如何转成视觉隐喻
 
-如果成片问题来自 Omni 的快速生成限制，直接说明；只有需要精确图层控制时，才建议切换到 HyperFrames。
+如果成片问题来自 MiniMax H3 的快速生成限制，直接说明；只有需要精确图层控制时，才建议切换到 HyperFrames。
 
-## 旧 Veo 脚本
+## 旧脚本
 
-目录中的 `scripts/generate_veo_first_last.py` 仅为旧项目兼容保留。不要在默认流程中调用它。只有用户明确要求 Veo 时才使用。
+目录中的 `scripts/generate_veo_first_last.py`（Veo）、`scripts/generate_video.py` 与 `scripts/upload_file.py`（Gemini Omni Flash）、`scripts/generate_video_seedance.py`（即梦 Seedance 2.5 / 火山方舟）仅为旧项目兼容保留，Gemini 链路在国内无法直连。不要在默认流程中调用它们。
