@@ -195,7 +195,7 @@ def download_video_file(video_url, output_path):
         raise RuntimeError(f"Error downloading video: {e.code} - {e.read().decode(errors='replace')}")
 
 
-def generate_video(prompt, api_key, model=DEFAULT_MODEL, aspect_ratio="9:16", duration=None,
+def generate_video(prompt, api_key, model=DEFAULT_MODEL, aspect_ratio="3:4", duration=None,
                    first_frame=None, last_frame=None, output_path="output.mp4"):
     """Creates a Seedance task, waits for completion, downloads the MP4."""
     duration = parse_and_validate_duration(duration)
@@ -223,7 +223,7 @@ def run_job(job, api_key):
         print("Warning: Skipping job with empty prompt.", file=sys.stderr)
         return {"job": job, "status": "SKIPPED", "error": "Empty prompt"}
 
-    aspect_ratio = job.get("aspect_ratio", "9:16")
+    aspect_ratio = job.get("aspect_ratio", "3:4")
     duration = job.get("duration")
     output_path = job.get("output")
     model = job.get("model", DEFAULT_MODEL)
@@ -267,8 +267,8 @@ def main():
     parser.add_argument("prompt", nargs="?", help="Text prompt for a single video generation")
     parser.add_argument("--image", action="append",
                         help="Local frame image path. Two images = first frame + last frame; one image = last frame only (can be specified multiple times)")
-    parser.add_argument("--aspect-ratio", default="9:16", choices=["16:9", "9:16", "1:1", "4:3", "3:4", "adaptive"],
-                        help="Aspect ratio (default: 9:16)")
+    parser.add_argument("--aspect-ratio", default="3:4", choices=["16:9", "9:16", "1:1", "4:3", "3:4", "adaptive"],
+                        help="Aspect ratio (default: 3:4)")
     parser.add_argument("--duration", type=argparse_duration_type, default=5,
                         help="Video duration in seconds, integer 4-30 (default: 5)")
     parser.add_argument("--model", default=DEFAULT_MODEL,

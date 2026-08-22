@@ -34,7 +34,7 @@ def main():
     parser.add_argument("--model", default="veo-3.1-fast-generate-001")
     parser.add_argument("--native-duration", type=int, default=8)
     parser.add_argument("--final-duration", type=int, default=10)
-    parser.add_argument("--aspect-ratio", default="9:16")
+    parser.add_argument("--aspect-ratio", default="3:4")
     parser.add_argument("--resolution", default="720p")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()

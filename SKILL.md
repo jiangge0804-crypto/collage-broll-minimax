@@ -93,7 +93,7 @@ MiniMax-H3
 - 所有纸片有清晰裁切边、奶油白 keyline、低透明度柔和阴影和纸张颗粒
 - 动作是 assemble-from-empty，而不是轻微漂移、晃动或慢 zoom
 - 无字幕、无口播全文、无 logo、无水印、无 UI
-- 默认交付 9:16、5 秒、720×1280、24fps、无声 MP4
+- 默认交付 3:4、5 秒、768×1024、24fps MP4；音轨规则：**要纸张拼贴拟音（剪纸、滑入、卡位声），禁 BGM 背景音乐**——模型出乐则去轨降级为无声
 
 ## 什么时候不要用
 
@@ -132,6 +132,7 @@ MiniMax-H3
 │   │   └── last-frame.png
 │   └── video/run-v01/
 │       ├── final-5s.mp4
+│       ├── final-5s-sfx.mp4
 │       ├── final-5s-noaudio.mp4
 │       ├── contact-sheet.jpg
 │       ├── video-last-frame.jpg
@@ -177,7 +178,7 @@ MiniMax-H3
   "script_meaning": "",
   "visual_metaphor": "",
   "style_signature": "flat bold color field, mixed black-and-white halftone cut-outs and colored cardstock accents, crisp cut edges, cream keylines, soft paper shadows, editorial paper collage",
-  "aspect_ratio": "9:16",
+  "aspect_ratio": "3:4",
   "color_field": {
     "background_hex": "",
     "accent_colors": [],
@@ -219,11 +220,11 @@ MiniMax-H3
 
 ```text
 Use case: ads-marketing
-Asset type: final still frame for a 9:16 image-to-video B-roll clip
+Asset type: final still frame for a 3:4 image-to-video B-roll clip
 Primary request: Create a finished editorial paper-collage image expressing [一句话视觉命题].
 Scene/backdrop: perfectly flat [颜色] paper field [hex] with subtle uncoated paper fiber.
 Style/medium: premium editorial stop-motion paper collage; black-and-white halftone photographic cut-outs mixed with selective [点色] colored cardstock.
-Composition/framing: vertical 9:16 locked poster frame; central subject within the middle 70 percent; generous clean color-field negative space; 3–6 large separable paper groups for later assemble-from-empty animation.
+Composition/framing: vertical 3:4 locked poster frame; central subject within the middle 70 percent; generous clean color-field negative space; 3–6 large separable paper groups for later assemble-from-empty animation.
 Materials/textures: visible printed halftone dots, crisp machine-cut edges, thin warm-cream paper keylines, soft low-opacity physical drop shadows.
 Constraints: [本条隐喻必须一眼看懂的关系].
 Avoid: no typography, no readable letters, no numerals, no logos, no watermark, no UI, no subtitles, no glossy 3D, no photoreal environment, no clutter.
@@ -250,14 +251,14 @@ Avoid: no typography, no readable letters, no numerals, no logos, no watermark, 
 
 ```bash
 ffmpeg -y -i <item>/frames/last-frame-original.png \
-  -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" \
+  -vf "scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440" \
   <item>/frames/last-frame.png
 ```
 
 首帧默认是与尾帧相同底色的纯色空纸面：
 
 ```bash
-ffmpeg -y -f lavfi -i color=c=0x<HEX>:s=1080x1920 \
+ffmpeg -y -f lavfi -i color=c=0x<HEX>:s=1080x1440 \
   -frames:v 1 <item>/frames/first-frame.png
 ```
 
@@ -278,9 +279,11 @@ Paper-collage stop-motion assembly, using Image 1 as the exact empty first frame
 
 Assemble the scene piece by piece with crisp physical stop-motion timing: [按顺序描述 3–6 个元素如何滑入、卡位、连接和完成动作]. End by holding the supplied completed composition.
 
-Preserve the exact 9:16 framing, [hex] color field, colored cardstock accents, uncoated paper grain, halftone dots, cream keylines, crisp cut edges and soft shadows. Restrained tactile 2D paper craft only.
+Preserve the exact 3:4 framing, [hex] color field, colored cardstock accents, uncoated paper grain, halftone dots, cream keylines, crisp cut edges and soft shadows. Restrained tactile 2D paper craft only.
 
-No scene cuts, no camera movement, no zoom, no morphing, no new objects, no text, no letters, no numbers, no logos, no watermark, no UI, no sound.
+No scene cuts, no camera movement, no zoom, no morphing, no new objects, no text, no letters, no numbers, no logos, no watermark, no UI.
+
+Sound design: diegetic paper-craft foley only, tightly synced to the assembly — crisp paper cutting, cardstock sliding in and snapping into place, light paper rustle. Strictly no music, no background music, no melody, no rhythm track, no ambience, no narration.
 ```
 
 每条 prompt 都要明确 Image 1 是空首帧、Image 2 是确认过的完成帧。最终构图必须贴近 Image 2，不让模型自由改造尾帧。
@@ -303,7 +306,7 @@ No scene cuts, no camera movement, no zoom, no morphing, no new objects, no text
     "<item>/frames/last-frame.png"
   ],
   "output": "<item>/video/run-v01/final-5s.mp4",
-  "aspect_ratio": "9:16",
+  "aspect_ratio": "3:4",
   "duration": 5
 }
 ```
@@ -316,19 +319,37 @@ python3 <本skill目录>/scripts/generate_video_minimax.py \
   --concurrency 3
 ```
 
-脚本默认模型即 `MiniMax-H3`、默认分辨率 768P（更省钱；要 2K 画质可在 job 里加 `"resolution": "2K"`）。首尾帧模式下宽高比由输入图片自动决定（9:16 帧即得 9:16 视频），图片以 base64 内联上传。如果报未开通/欠费错误，去 MiniMax 开放平台完成按量购买开通后重试。
+脚本默认模型即 `MiniMax-H3`、默认分辨率 768P（更省钱；要 2K 画质可在 job 里加 `"resolution": "2K"`）。首尾帧模式下宽高比由输入图片自动决定（3:4 帧即得 3:4 视频），图片以 base64 内联上传。如果报未开通/欠费错误，去 MiniMax 开放平台完成按量购买开通后重试。
 
-### 5. 强制无声交付（并统一到 720×1280）
+### 5. 音效交付（并统一到 768×1024）——纸张拟音可以要，BGM 不要
 
-MiniMax H3 原生带立体声音轨，且 768P 档 9:16 输出为 768×1365。交付前用 ffmpeg 去音轨并缩放到标准 720×1280：
+音轨规则：**纸片组装类动效音效（拟音）是需要的，背景音乐 BGM 是禁止的。**
+
+1. 视频 prompt 末尾必须带 Sound design 段（见上文模板），引导 MiniMax H3 只生成纸张拟音、严禁音乐。
+2. 生成后先做音轨 QA（agent 无法试听，用能量分布启发式判断——拟音是稀疏瞬态、含静音间隙；BGM 是连续满能量、几乎无静音）：
 
 ```bash
-ffmpeg -y -i <run>/final-5s.mp4 \
-  -map 0:v:0 -vf "scale=720:1280" -c:v libx264 -crf 18 -pix_fmt yuv420p -an \
-  <run>/final-5s-noaudio.mp4
+ffmpeg -i <run>/final-5s.mp4 -af silencedetect=noise=-35dB:d=0.15 -f null - 2>&1 | grep silence
 ```
 
-默认交付 `final-5s-noaudio.mp4`，保留原始 `final-5s.mp4` 作为中间产物。
+3. 按检测结果分支（注意 zsh 下 `?` 必须加引号）：
+   - **检测到多段静音间隙**（判定为拟音）→ 保留音轨交付：
+
+   ```bash
+   ffmpeg -y -i <run>/final-5s.mp4 \
+     -map 0:v:0 -map "0:a:0?" -vf "scale=768:1024" -c:v libx264 -crf 18 -pix_fmt yuv420p \
+     -c:a aac -b:a 128k -shortest <run>/final-5s-sfx.mp4
+   ```
+
+   - **无静音间隙**（判定为 BGM）→ 去音轨降级交付：
+
+   ```bash
+   ffmpeg -y -i <run>/final-5s.mp4 \
+     -map 0:v:0 -vf "scale=768:1024" -c:v libx264 -crf 18 -pix_fmt yuv420p -an \
+     <run>/final-5s-noaudio.mp4
+   ```
+
+启发式不百分百准确；拿不准时优先去音轨（宁缺毋滥，绝不允许 BGM 混进交付），并向用户说明可提供带原生音轨的版本供人工试听。原始 `final-5s.mp4` 始终保留为中间产物。
 
 ## 视频 QA
 
@@ -337,8 +358,8 @@ ffmpeg -y -i <run>/final-5s.mp4 \
 ### Contact sheet
 
 ```bash
-ffmpeg -y -i <run>/final-5s-noaudio.mp4 \
-  -vf "fps=1,scale=270:480,tile=5x1" \
+ffmpeg -y -i <run>/final-5s-sfx.mp4 \
+  -vf "fps=1,scale=270:360,tile=5x1" \
   -frames:v 1 <run>/contact-sheet.jpg
 ```
 
@@ -349,7 +370,7 @@ ffmpeg -y -i <run>/final-5s-noaudio.mp4 \
 - 没有切镜、zoom、3D 化或写实场景漂移
 - 没有假字、logo、水印或 UI
 - 最终帧与确认静帧一致；轻微姿态或细节漂移（如人物姿势微变、小零件增减）只要不影响隐喻语义即可判通过，不要为此重跑
-- 成片为 720×1280、24fps、5 秒、零音轨
+- 成片为 768×1024、24fps、5 秒；音轨只含纸张拟音（final-5s-sfx.mp4），或为无声降级（final-5s-noaudio.mp4）；绝不含 BGM
 
 另外抽取视频末帧，与确认静帧并排生成 `end-frame-comparison.jpg`。批量项目再合并三张总览图：
 
@@ -371,7 +392,7 @@ ffmpeg -y -i <run>/final-5s-noaudio.mp4 \
 
 向用户交付：
 
-- 每条 `<item>/video/run-v01/final-5s-noaudio.mp4`
+- 每条 `<item>/video/run-v01/final-5s-sfx.mp4`（带纸张拟音；若模型出了 BGM 则降级交付 `final-5s-noaudio.mp4` 并说明）
 - 每条 contact sheet
 - 批量总 contact sheet
 - 最终帧对照图

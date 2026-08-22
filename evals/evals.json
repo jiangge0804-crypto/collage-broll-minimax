@@ -16,7 +16,7 @@
     {
       "id": 3,
       "prompt": "这些彩色拼贴静帧全部通过，帮我继续生成视频。",
-      "expected_output": "At Gate 3, should automatically use MiniMax-H3 through the generate_video_minimax.py workflow without asking for a model, use exact empty first and approved last frames, generate 5s 9:16 video, strip audio, create contact sheets and verify the end frame. It must not default to Veo, Gemini or Seedance.",
+      "expected_output": "At Gate 3, should automatically use MiniMax-H3 through the generate_video_minimax.py workflow without asking for a model, use exact empty first and approved last frames, generate 5s 3:4 video, strip audio, create contact sheets and verify the end frame. It must not default to Veo, Gemini or Seedance.",
       "files": []
     },
     {

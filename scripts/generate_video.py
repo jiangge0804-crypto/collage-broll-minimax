@@ -180,7 +180,7 @@ def download_video_file(file_uri, output_path, api_key):
     except urllib.error.HTTPError as e:
         raise RuntimeError(f"Error downloading video file: {e.code} - {e.read().decode()}")
 
-def generate_video(prompt, api_key, model="gemini-omni-flash-preview", aspect_ratio="16:9", duration=None, image_path=None, video_path=None, output_path="output.mp4", strip_audio=False, previous_interaction_id=None):
+def generate_video(prompt, api_key, model="gemini-omni-flash-preview", aspect_ratio="3:4", duration=None, image_path=None, video_path=None, output_path="output.mp4", strip_audio=False, previous_interaction_id=None):
     """Creates an interaction with the video model and downloads the resulting video using the official google-genai SDK."""
     duration = parse_and_validate_duration(duration)
     input_parts = []
@@ -280,7 +280,7 @@ def run_job(job, api_key):
         print("Warning: Skipping job with empty prompt.", file=sys.stderr)
         return {"job": job, "status": "SKIPPED", "error": "Empty prompt"}
 
-    aspect_ratio = job.get("aspect_ratio", "16:9")
+    aspect_ratio = job.get("aspect_ratio", "3:4")
     duration = job.get("duration")
     image_path = job.get("image")
     video_path = job.get("video")
@@ -317,7 +317,7 @@ def main():
     parser.add_argument("prompt", nargs="?", help="Text prompt / instruction for a single video generation")
     parser.add_argument("--image", action="append", help="Optional local image path or File API URI for referencing / image-to-video (can be specified multiple times)")
     parser.add_argument("--video", action="append", help="Optional local video path or File API URI for editing / extending (can be specified multiple times)")
-    parser.add_argument("--aspect-ratio", default="16:9", choices=["16:9", "9:16"], help="Aspect ratio (default: 16:9)")
+    parser.add_argument("--aspect-ratio", default="3:4", choices=["16:9", "9:16", "3:4"], help="Aspect ratio (default: 3:4; legacy Gemini path may only support 16:9/9:16 upstream)")
     parser.add_argument("--duration", type=argparse_duration_type, default=None, help="Video duration as an integer between 3 and 10 seconds (e.g., 5, 10). Default: None (API/Model decides, typically 10s or matches source)")
     parser.add_argument("--model", default="gemini-omni-flash-preview", help="Gemini Omni Flash video model ID (default: gemini-omni-flash-preview)")
     parser.add_argument("--output", help="Local output file path for single generation (default: media/output.mp4)")

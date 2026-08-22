@@ -2,7 +2,7 @@
 
 > **本分支说明**：这是 [pyang5166/gbro-collage-broll](https://github.com/pyang5166/gbro-collage-broll) 的改造分支（原作者：狗哥笔记，MIT License）。原版 Gate 3 视频生成依赖 Gemini Omni Flash，国内无法直连；本分支将视频链路替换为 **MiniMax H3（海螺 3.0）**，`api.minimaxi.com` 国内直连、纯 Python 标准库实现（无需任何第三方 SDK / venv），另保留即梦 Seedance 2.5（火山方舟）脚本备选。三闸门审批流程与拼贴美学规范与原版完全一致。
 >
-> 与原版差异：默认模型 `MiniMax-H3`（768P，可选 2K）；API Key 读取顺序为 `--api-key` 参数 → 环境变量 `MINIMAX_API_KEY` → skill 目录下 `.env` 文件（**请勿提交你的 .env**，已在 .gitignore 排除）；交付步骤会用 ffmpeg 去音轨并统一到 720×1280。
+> 与原版差异：默认模型 `MiniMax-H3`（768P，可选 2K）；API Key 读取顺序为 `--api-key` 参数 → 环境变量 `MINIMAX_API_KEY` → skill 目录下 `.env` 文件（**请勿提交你的 .env**，已在 .gitignore 排除）；交付步骤会用 ffmpeg 去音轨并统一到 1080×1440（3:4）。
 
 <p align="center">
   <img src="assets/demo-purple.gif" width="180" alt="深紫底：多人协作压出科幻胶片">
@@ -19,7 +19,7 @@ Turn a ~5s voiceover line into a premium editorial paper-collage assemble-from-e
 
 - 强烈平坦的纯色纸面色场 + 黑白 halftone 照片剪贴 + 彩色卡纸点缀
 - 元素从空场逐件滑入、卡位、组装（stop-motion 质感），不是淡入或慢 zoom
-- 默认交付 9:16、5 秒、720×1280、24fps、无声 MP4，可直接垫在口播下面
+- 默认交付 3:4、5 秒、1080×1440、24fps、无声 MP4，可直接垫在口播下面
 
 ## 工作流：三闸门审批
 
