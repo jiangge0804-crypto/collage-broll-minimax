@@ -416,7 +416,27 @@ ffmpeg -y -i <run>/final-5s-sfx.mp4 \
 - 尾帧漂移：强化 “Image 2 is the exact completed last frame” 和 “End by holding the supplied completed composition”
 - 已印文字标签漂移/被重绘：prompt 里逐一点名锁定——"The printed paper labels already on the [objects] — the Chinese label on the left and the [X] label on the right — must stay exactly as they are, completely unchanged, not redrawn, not re-lettered, not moved."（实测两处中文/英文标签 7 秒全程零漂移）
 - 出现假字：先回到静帧重生，不要直接用视频 prompt 修补
+- ImageGen 右下角内置水印（"AI生成 WORKBUDDY"）：用 `drawbox` 拿底色盖掉，但**必须用实测采样色**——ImageGen 实际渲染的底色和提示词里写的 hex 有偏差（实测提示 #0F6E56 渲染成 #1E6E69），直接用提示词色会留下明显色块。采样一行：
+
+  ```bash
+  ffmpeg -y -i still.png -vf "crop=1:1:900:1380" -frames:v 1 -f rawvideo -pix_fmt rgb24 - \
+    | od -An -tx1 | head -1     # 读出 RGB，再填进 drawbox=color=0x......
+  # 去水印 + 统一 3:4，一次完成：
+  ffmpeg -y -i still.png -vf "drawbox=x=980:y=1420:w=172:h=116:color=0x1E6E69@1.0:t=fill,scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440" -frames:v 1 last-frame.png
+  ```
+
+  首帧纯色空场也必须用同一个实测色，否则组装动画首尾底色不一致。
 - 个别视频失败：只重跑对应 job，不要重跑已经通过的条目
+- **本地轮询被截断，但远端任务还在跑**（shell 被 SIGTERM，或 `poll_task` 抛 "did not finish within 20 minutes"）：`generate_video_minimax.py` 是"先建远端任务、再本地轮询"，`POLL_DEADLINE` 硬编码 20 分钟。**不要重新提交同一 job——会二次计费**。正确做法是只查 `GET /v2/query/video_generation/{task_id}` 拿 `task.content.url` 下载：
+
+  ```python
+  # 脚本会打印 "Task created: <task_id>"，记下它
+  url = f"https://api.minimaxi.com/v2/query/video_generation/{task_id}"
+  # header: Authorization: Bearer $MINIMAX_API_KEY
+  # 成功时 task["content"]["url"] 即下载直链，直接 urllib 落盘
+  ```
+
+  实测：7 秒任务在高峰期可能排队 30 分钟以上仍为 `running`（`updated_at` 不刷新属正常），远端不会被取消。等待窗口要自己放宽（用独立续查脚本，别依赖 `poll_task` 的 20 分钟上限），并且下载后务必用 `ffprobe` 校验时长/分辨率再进 QA。
 
 ## 默认交付
 
