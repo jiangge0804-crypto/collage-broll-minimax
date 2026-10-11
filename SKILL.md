@@ -292,6 +292,8 @@ Sound design: diegetic paper-craft foley only, tightly synced to the assembly �
 
 `generate_video_minimax.py` 只依赖 Python 标准库（>= 3.10），不需要任何第三方 SDK 或 venv，直接用系统 `python3` 运行。
 
+ffmpeg / ffprobe 注意：部分 agent 沙箱 shell 的 PATH 不含 `/opt/homebrew/bin`，`command -v ffmpeg` 会误报缺失。`check_setup.sh` 会自动探测常见安装目录并提示绝对路径；一旦它提示"不在 PATH"，后续所有 ffmpeg 命令都必须用绝对路径（如 `/opt/homebrew/bin/ffmpeg`），不要依赖裸命令。
+
 确认 `MINIMAX_API_KEY` 已设置，但不要输出或记录密钥内容。
 
 ### 4. 批量调用 MiniMax H3

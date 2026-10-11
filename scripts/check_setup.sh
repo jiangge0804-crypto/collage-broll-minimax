@@ -20,9 +20,28 @@ else
   bad "MINIMAX_API_KEY 未设置（到 MiniMax 开放平台创建：https://platform.minimaxi.com/user-center/basic-information/interface-key ，创建后写入 $SKILL_DIR/.env 或 export 到 shell 配置；并确认已开通 H3 按量付费）"
 fi
 
-# 2. ffmpeg / ffprobe
-if command -v ffmpeg >/dev/null 2>&1 && command -v ffprobe >/dev/null 2>&1; then
-  ok "ffmpeg / ffprobe 可用"
+# 2. ffmpeg / ffprobe（PATH 之外再探测常见安装位置——部分 agent 沙箱 shell 的 PATH
+#    不含 /opt/homebrew/bin，会导致误报缺失。探测到后导出 FFMPEG_BIN 供后续命令复用）
+FFMPEG_BIN=""
+find_ffmpeg() {
+  if command -v ffmpeg >/dev/null 2>&1 && command -v ffprobe >/dev/null 2>&1; then
+    FFMPEG_BIN="$(dirname "$(command -v ffmpeg)")"
+    return 0
+  fi
+  for d in /opt/homebrew/bin /usr/local/bin /opt/ffmpeg/bin /usr/bin; do
+    if [ -x "$d/ffmpeg" ] && [ -x "$d/ffprobe" ]; then
+      FFMPEG_BIN="$d"
+      return 0
+    fi
+  done
+  return 1
+}
+if find_ffmpeg; then
+  if [ "$FFMPEG_BIN" != "$(dirname "$(command -v ffmpeg 2>/dev/null || echo /nonexistent/ffmpeg)")" ]; then
+    ok "ffmpeg / ffprobe 可用（不在 PATH，需用绝对路径：$FFMPEG_BIN/ffmpeg）"
+  else
+    ok "ffmpeg / ffprobe 可用"
+  fi
 else
   bad "ffmpeg / ffprobe 缺失（macOS: brew install ffmpeg；Debian/Ubuntu: sudo apt install ffmpeg）"
 fi
