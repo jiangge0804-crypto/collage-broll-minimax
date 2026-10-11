@@ -37,6 +37,14 @@ bash <本skill目录>/scripts/check_setup.sh
 
    注意：视频生成按量计费，由这个 key 对应的 MiniMax 账号承担；首次使用 H3 需先在平台完成按量购买开通（见[定价页](https://platform.minimaxi.com/docs/guides/pricing-paygo)）。
 
+   **强烈建议用环境变量而不是 skill 目录下的 `.env`**：部分宿主环境（如 WorkBuddy 的 brokered file sandbox）会把 `.env` 判定为敏感内容并弹授权；若用户没及时点允许，脚本会抛 `PermissionError: Sensitive content approval timed out`，视频生成直接失败。写入 shell 配置后 `generate_video_minimax.py` 优先读环境变量，永远不会去打开 `.env`：
+
+   ```bash
+   echo 'export MINIMAX_API_KEY="你的key"' >> ~/.zshrc && source ~/.zshrc
+   ```
+
+   bash 层的 `sed/grep` 读取 `.env` 同样会被拦截，不要试图用 shell 变量绕过；正确做法是让用户配好环境变量，或让用户在授权弹窗点"允许"后重跑。
+
 2. **ffmpeg / ffprobe 缺失**
    macOS：`brew install ffmpeg`；Debian/Ubuntu：`sudo apt install ffmpeg`。
 
