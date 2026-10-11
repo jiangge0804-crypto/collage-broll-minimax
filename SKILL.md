@@ -163,6 +163,12 @@ MiniMax-H3
 
 批量隐喻优先形成前后叙事：例如先表现手工消耗与经验流失，再表现规范沉淀与人机分工。
 
+隐喻打磨三条实战经验（2026-10「搜索迁移」项目验证）：
+
+- 对比类文稿（"A 更适合 X，B 更适合 Y"）优先画**决策瞬间**（岔路口二选一、转身、犹豫后迈步），而不是把两种遭遇并排对比——把"转变"这个动作本身画成画面主体，语义远比"两种结果对照"清晰。
+- 文案主语必须在画面落实：说"大家"就要有群体证据（一群小人、右路上已有先行者剪影）。只画一个人会丢掉"多数人"的语感，用户会打回。
+- 3:4 竖版的对照类构图优先上下分层或 Y 形分叉（路径自底部向上分叉），避免左右并排——并排在竖版会留大片死空间。
+
 ### Gate 1 输出示例
 
 ```text
@@ -272,6 +278,8 @@ ffmpeg -y -f lavfi -i color=c=0x<HEX>:s=1080x1440 \
 
 如果用户明确要求不从完全空白开始，首帧才保留一个基础物件。
 
+**末帧即终态（关键）**：首尾帧模式下视频结尾会严格收敛到 Image 2 的构图——结尾要出现的任何动作**结果**（人物已走到某处、手里已拿到某物、某物已消失）都必须直接画进末帧静帧，不能只写在 prompt 里。实测：末帧画"人停在岔路口犹豫"，无论 prompt 怎么写"然后走向门前拿到答案卡"，视频都会停在选择前一刻。要"完成动作"的闭环，就重画末帧把终态画进去，再重跑。
+
 ### 2. 写动画 prompt
 
 动作顺序默认采用：
@@ -303,6 +311,10 @@ Sound design: diegetic paper-craft foley only, tightly synced to the assembly �
 ffmpeg / ffprobe 注意：部分 agent 沙箱 shell 的 PATH 不含 `/opt/homebrew/bin`，`command -v ffmpeg` 会误报缺失。`check_setup.sh` 会自动探测常见安装目录并提示绝对路径；一旦它提示"不在 PATH"，后续所有 ffmpeg 命令都必须用绝对路径（如 `/opt/homebrew/bin/ffmpeg`），不要依赖裸命令。
 
 确认 `MINIMAX_API_KEY` 已设置，但不要输出或记录密钥内容。
+
+生成报 `HTTP 402 insufficient_balance_error (1008)` 时：让用户到 MiniMax 开放平台充值后原样重跑即可（prompt / 首尾帧 / jobs 全部保留，无需重建）。注意 H3 视频生成需在后台开通"按量付费"，钱包余额与视频按量额度是分开的；若后台显示余额充足仍报 1008，拿返回的 request_id 找客服。不要为绕过 402 换模型或改管线。
+
+不要尝试用 WorkBuddy 内置 VideoGen 替代本管线：它虽支持 `last_image` 首尾帧插值，但 `aspect_ratio` 不支持 3:4（实测报 `14407 unsupported video aspect_ratio: 3:4, supported values: []`），无法产出竖版成片。
 
 ### 4. 批量调用 MiniMax H3
 
@@ -390,11 +402,19 @@ ffmpeg -y -i <run>/final-5s-sfx.mp4 \
 
 逐条 QA 结论（含带瑕疵通过的判定理由）写入 `<project>/gate3-qa.md`。
 
+抽帧与 QA 图注意事项：
+
+- `tile` 需要的格数多于实际抽帧数时会**补黑格**（如 7.29s 视频 `fps=1,tile=2x4` 只有 8 帧但最后一格可能发黑）——先用 `blackdetect=d=0.1:pix_th=0.10` 确认成片真的没有黑帧，再决定是否需要处理，不要被 QA 图吓到重跑。
+- 竖版项目的 contact sheet 与末帧对照图一律 **vstack 竖排**（如 540×1440），不要出横版拼图——用户会把横版 QA 图误认为成片比例错了。
+- `ffprobe` 一次只能接一个输入文件，批量验证尺寸用 for 循环逐个跑。
+- 运动方向存疑时用 `fps=2` 密集抽帧复核，不要只看 `fps=1` 缩略拼图下结论（小人很小容易看错位置和方向）。
+
 ### 常见问题
 
 - 首帧边缘提前露出：轻微可接受；严格空场需求改用 HyperFrames 补前段
 - 组装感弱：缩短元素数量，并把 prompt 改为明确的逐件 slide in / snap into place 顺序
 - 尾帧漂移：强化 “Image 2 is the exact completed last frame” 和 “End by holding the supplied completed composition”
+- 已印文字标签漂移/被重绘：prompt 里逐一点名锁定——"The printed paper labels already on the [objects] — the Chinese label on the left and the [X] label on the right — must stay exactly as they are, completely unchanged, not redrawn, not re-lettered, not moved."（实测两处中文/英文标签 7 秒全程零漂移）
 - 出现假字：先回到静帧重生，不要直接用视频 prompt 修补
 - 个别视频失败：只重跑对应 job，不要重跑已经通过的条目
 
